@@ -98,30 +98,33 @@ typedef struct {
 LV2_Handle
 instantiate_Echo(const LV2_Descriptor * Descriptor, double SampleRate, const char* bundle_path, const LV2_Feature* const* features) {
 
-	LV2_Handle * ptr;
+	Echo *ptr = calloc(1, sizeof(Echo));
 
-	if ((ptr = malloc(sizeof(Echo))) != NULL) {
-		((Echo *)ptr)->sample_rate = SampleRate;
-		((Echo *)ptr)->smoothdry = -4.0f;
-		((Echo *)ptr)->smoothstrength_L = -4.0f;
-		((Echo *)ptr)->smoothstrength_R = -4.0f;
+	if (ptr != NULL) {
+		ptr->sample_rate = SampleRate;
+		ptr->smoothdry = -4.0f;
+		ptr->smoothstrength_L = -4.0f;
+		ptr->smoothstrength_R = -4.0f;
 
 		/* allocate memory for ringbuffers and related dynamic vars */
-		if ((((Echo *)ptr)->ringbuffer_L =
-		     calloc(MAX_DELAY * ((Echo *)ptr)->sample_rate / 1000,
-			    sizeof(float))) == NULL)
-			exit(1);
-		if ((((Echo *)ptr)->ringbuffer_R =
-		     calloc(MAX_DELAY * ((Echo *)ptr)->sample_rate / 1000,
-			    sizeof(float))) == NULL)
-			exit(1);
-		if ((((Echo *)ptr)->buffer_pos_L = calloc(1, sizeof(unsigned long))) == NULL)
-			exit(1);
-		if ((((Echo *)ptr)->buffer_pos_R = calloc(1, sizeof(unsigned long))) == NULL)
-			exit(1);
+		ptr->ringbuffer_L = calloc(MAX_DELAY * ptr->sample_rate / 1000,
+		                           sizeof(float));
+		ptr->ringbuffer_R = calloc(MAX_DELAY * ptr->sample_rate / 1000,
+		                           sizeof(float));
+		ptr->buffer_pos_L = calloc(1, sizeof(unsigned long));
+		ptr->buffer_pos_R = calloc(1, sizeof(unsigned long));
+		if (ptr->ringbuffer_L == NULL || ptr->ringbuffer_R == NULL ||
+		    ptr->buffer_pos_L == NULL || ptr->buffer_pos_R == NULL) {
+			free(ptr->ringbuffer_L);
+			free(ptr->ringbuffer_R);
+			free(ptr->buffer_pos_L);
+			free(ptr->buffer_pos_R);
+			free(ptr);
+			return NULL;
+		}
 
-		*(((Echo *)ptr)->buffer_pos_L) = 0;
-		*(((Echo *)ptr)->buffer_pos_R) = 0;
+		*(ptr->buffer_pos_L) = 0;
+		*(ptr->buffer_pos_R) = 0;
 
 		return ptr;
 	}
