@@ -49,7 +49,7 @@ all: $(PLUGIN_SO)
 $(PLUGIN_SO): $(SRC) $(wildcard *.h) ../utils/tap_utils.h $(PICOLV2_RUNTIME_OBJ)
 	$(CC) $(SRC) $(PICOLV2_RUNTIME_OBJ) $(CFLAGS) $(LDFLAGS) -o $(PLUGIN_SO)
 
-picolv2-runtime.o: ../../../lib/picolv2lib.c
+picolv2-runtime.o: ../../../sdk/src/runtime.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
